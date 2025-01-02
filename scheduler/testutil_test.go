@@ -5,8 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/AkihiroSuda/go-dag"
-	"github.com/docker/docker/pkg/testutil/assert"
+	"github.com/jhebden-gl/go-dag"
 )
 
 func determineFakeWorkload(g *dag.Graph, maxSleep time.Duration, seed int64) map[dag.Node]time.Duration {
@@ -47,7 +46,9 @@ func testExecute(t *testing.T, g *dag.Graph, concurrency uint, workload map[dag.
 		c <- n
 		return nil
 	})
-	assert.NilError(t, err)
+	if err != nil {
+		t.Errorf("testExecute: returned error %v", err)
+	}
 	var got []dag.Node
 	for i := 0; i < len(g.Nodes); i++ {
 		n := <-c

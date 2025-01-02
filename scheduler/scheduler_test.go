@@ -4,8 +4,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/AkihiroSuda/go-dag"
-	"github.com/docker/docker/pkg/testutil/assert"
+	"github.com/jhebden-gl/go-dag"
 )
 
 const (
@@ -63,11 +62,21 @@ func testExecute0(t *testing.T, concurrency uint) {
 	took := time.Now().Sub(begun)
 	t.Logf("Took: %v (%2.2f%% of ideal)", took, 100*float64(took)/float64(ideal))
 
-	assert.Equal(t, len(got), 6)
-	assert.Equal(t, indexOf(got, 0) < indexOf(got, 2), true)
-	assert.Equal(t, indexOf(got, 2) < indexOf(got, 4), true)
-	assert.Equal(t, indexOf(got, 2) < indexOf(got, 5), true)
-	assert.Equal(t, indexOf(got, 1) < indexOf(got, 3), true)
+	if len(got) != 6 {
+		t.Errorf("testExecute0: length of results was not correct: %d", len(got))
+	}
+	if indexOf(got, 0) >= indexOf(got, 2) {
+		t.Errorf("testExecute0: indexOf node 0 not less than node 2: %d, %d", indexOf(got, 0), indexOf(got, 2))
+	}
+	if indexOf(got, 2) >= indexOf(got, 4) {
+		t.Errorf("testExecute0: indexOf node 2 not less than node 4: %d, %d", indexOf(got, 2), indexOf(got, 4))
+	}
+	if indexOf(got, 2) >= indexOf(got, 5) {
+		t.Errorf("testExecute0: indexOf node 2 not less than node 5: %d, %d", indexOf(got, 2), indexOf(got, 5))
+	}
+	if indexOf(got, 1) >= indexOf(got, 3) {
+		t.Errorf("testExecute0: indexOf node 1 not less than node 3: %d, %d", indexOf(got, 1), indexOf(got, 3))
+	}
 }
 
 func TestExecute1_0(t *testing.T) {
@@ -127,12 +136,24 @@ func testExecute1(t *testing.T, concurrency uint) {
 	took := time.Now().Sub(begun)
 	t.Logf("Took: %v (%2.2f%% of ideal)", took, 100*float64(took)/float64(ideal))
 
-	assert.Equal(t, len(got), 7)
-	assert.Equal(t, indexOf(got, 0) < indexOf(got, 2), true)
-	assert.Equal(t, indexOf(got, 2) < indexOf(got, 4), true)
-	assert.Equal(t, indexOf(got, 2) < indexOf(got, 5) && indexOf(got, 3) < indexOf(got, 5), true)
-	assert.Equal(t, indexOf(got, 1) < indexOf(got, 3), true)
-	assert.Equal(t, indexOf(got, 4) < indexOf(got, 6) && indexOf(got, 3) < indexOf(got, 6), true)
+	if len(got) != 7 {
+		t.Errorf("testExecute1: length of results was not correct: %d", len(got))
+	}
+	if indexOf(got, 0) >= indexOf(got, 2) {
+		t.Errorf("testExecute1: indexOf node 0 not less than node 2: %d, %d", indexOf(got, 0), indexOf(got, 2))
+	}
+	if indexOf(got, 2) >= indexOf(got, 4) {
+		t.Errorf("testExecute1: indexOf node 2 not less than node 4: %d, %d", indexOf(got, 2), indexOf(got, 4))
+	}
+	if indexOf(got, 2) >= indexOf(got, 5) || indexOf(got, 3) >= indexOf(got, 5) {
+		t.Errorf("testExecute1: indexOf node 2 not less than node 5 or indexOf node 3 not less than node 5: %d, %d + %d, %d", indexOf(got, 2), indexOf(got, 5), indexOf(got, 3), indexOf(got, 5))
+	}
+	if indexOf(got, 1) >= indexOf(got, 3) {
+		t.Errorf("testExecute1: indexOf node 1 not less than node 3: %d, %d", indexOf(got, 1), indexOf(got, 3))
+	}
+	if indexOf(got, 4) >= indexOf(got, 6) || indexOf(got, 3) >= indexOf(got, 6) {
+		t.Errorf("testExecute1: indexOf node 4 not less than node 6 or indexOf node 3 not less than node 6: %d, %d + %d, %d", indexOf(got, 4), indexOf(got, 5), indexOf(got, 3), indexOf(got, 6))
+	}
 }
 
 func TestExecute2_0(t *testing.T) {
@@ -188,8 +209,16 @@ func testExecute2(t *testing.T, concurrency uint) {
 	took := time.Now().Sub(begun)
 	t.Logf("Took: %v (%2.2f%% of ideal)", took, 100*float64(took)/float64(ideal))
 
-	assert.Equal(t, len(got), 5)
-	assert.Equal(t, indexOf(got, 42) < indexOf(got, 100) && indexOf(got, 42) < indexOf(got, 200), true)
-	assert.Equal(t, indexOf(got, 100) < indexOf(got, 101) && indexOf(got, 200) < indexOf(got, 101), true)
-	assert.Equal(t, indexOf(got, 101) < indexOf(got, 102) && indexOf(got, 200) < indexOf(got, 102), true)
+	if len(got) != 5 {
+		t.Errorf("testExecute2: length of results was not correct: %d", len(got))
+	}
+	if indexOf(got, 42) >= indexOf(got, 100) || indexOf(got, 42) >= indexOf(got, 200) {
+		t.Errorf("testExecute2: indexOf node 42 not less than node 100 or indexOf node 42 not less than node 200: %d, %d + %d, %d", indexOf(got, 42), indexOf(got, 100), indexOf(got, 42), indexOf(got, 200))
+	}
+	if indexOf(got, 100) >= indexOf(got, 101) || indexOf(got, 200) >= indexOf(got, 101) {
+		t.Errorf("testExecute2: indexOf node 100 not less than node 101 or indexOf node 200 not less than node 101: %d, %d + %d, %d", indexOf(got, 100), indexOf(got, 101), indexOf(got, 200), indexOf(got, 101))
+	}
+	if indexOf(got, 101) >= indexOf(got, 102) || indexOf(got, 200) >= indexOf(got, 102) {
+		t.Errorf("testExecute2: indexOf node 101 not less than node 102 or indexOf node 200 not less than node 102: %d, %d + %d, %d", indexOf(got, 101), indexOf(got, 102), indexOf(got, 200), indexOf(got, 101))
+	}
 }

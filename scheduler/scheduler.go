@@ -5,7 +5,7 @@ import (
 
 	"golang.org/x/sync/errgroup"
 
-	"github.com/AkihiroSuda/go-dag"
+	"github.com/jhebden-gl/go-dag"
 )
 
 // Callback is used for Execute
